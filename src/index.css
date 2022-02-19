@@ -1014,12 +1014,13 @@ caption {
 .contain-table {
   overflow-x: auto;
 }
-
+/*
 @media (min-width: 600px) {
   .contain-table {
     width: 100%;
   }
 }
+*/
 
 /*
  * Navigation

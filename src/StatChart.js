@@ -1,28 +1,15 @@
 import './StatChart.css';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 let options = {
   responsive: true,
+  maintainAspectRatio: false,
+  indexAxis: 'y',
   plugins: {
     legend: {
       position: 'top',
@@ -30,51 +17,62 @@ let options = {
     title: {
       display: true,
       text: 'Your Stats',
+      color: 'white',
+    },
+    datalabels: {
+      display: true,
+      anchor: 'center',
+      color: 'white',
+      font: {
+        size: '25',
+      },
     },
   },
-  animation:{
-    duration: 0
+  animation: {
+    duration: 200,
   },
+  scales: {
+    y: {
+      ticks: {
+        color: 'white',
+      },
+    },
+    x: {
+      min: 0,
+      max: 100,
+      ticks: {
+        color: 'white',
+      },
+    },
+  },
+  color: 'white',
 };
 
-
 let dataStats = {
-  labels : ['Your stats'],
+  labels: [''],
   datasets: [
     {
       label: 'speed',
-      data: [20],
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      data: [],
+      backgroundColor: 'rgba(255, 99, 132, 1)',
     },
     {
       label: 'consistency',
-      data: [40],
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      data: [],
+      backgroundColor: 'rgba(53, 162, 235, 1)',
     },
   ],
 };
 
 function StatChart(props) {
-  const  divRef = React.useRef();
-  //const chart = this.chartReference.current.chartInstance;
-  console.log(divRef.current);
-  if(typeof divRef.current !== 'undefined') {
-    console.log(typeof divRef);
-    divRef.current.update()
-  }
-  //divRef.current.update();
   dataStats.datasets[0].data[0] = Math.round(props.avgTBC);
   dataStats.datasets[1].data[0] = Math.round(props.sd);
-  //console.log(props.avgTBC, props.sd);
-  //console.log(dataStats);
+
+  let d = JSON.parse(JSON.stringify(dataStats)); //deep clone object
   return (
-  <div id="statChart">
-  <Bar options={options} data={dataStats} ref={divRef}/>
-  </div>
+    <div className="statChart">
+      <Bar options={options} data={d} plugins={[ChartDataLabels]} className="barChart" />
+    </div>
   );
 }
 export default StatChart;
-
-/*
-<Bar options={options} data={dataStats} key={Math.random()} />
-*/

@@ -1,31 +1,17 @@
 import './TbcChart.css';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import React from 'react';
+import { useState, memo } from 'react';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import React ,{useState} from "react";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-export const options = {
+let options = {
   responsive: true,
-  animation:{
-    duration: 0
+  maintainAspectRatio: false,
+  animation: {
+    duration: 200,
+    easing: 'linear',
   },
   plugins: {
     legend: {
@@ -34,37 +20,41 @@ export const options = {
     title: {
       display: true,
       text: 'Time between clicks in ms',
+      color: 'white',
     },
   },
   scales: {
     y: {
       min: 0,
       suggestedMax: 300,
+      ticks: {
+        color: 'white',
+      },
     },
     x: {
       min: 0,
-
-    }
+      ticks: {
+        color: 'white',
+      },
+    },
   },
+  color: 'white',
 };
 
-let index = 0;
-
 let data = {
-  labels : [],
+  labels: [],
   datasets: [
     {
       label: 'your results',
       data: [],
-      //borderColor: 'rgb(255, 99, 132)',
-      borderColor: 'rebeccapurple',
-      backgroundColor: 'rebeccapurple',
+      borderColor: 'rgba(255, 185, 221, 1)',
+      backgroundColor: 'rgba(255, 185, 221, 1)',
     },
     {
       label: 'avg',
       data: [],
-      borderColor: 'red',
-      backgroundColor: 'red',
+      borderColor: 'rgba(0, 255, 0, 0.67)',
+      backgroundColor: 'rgba(0, 255, 0, 0.67)',
       pointRadius: 0,
     },
   ],
@@ -73,32 +63,30 @@ let data = {
 let showLastPoint = 0;
 
 function TbcChart(props) {
-  const [t,setT]=useState(0);
-  let lastPoint = props.datapoints[props.datapoints.length-1];
-  
-  //console.log(lastPoint);
-  if((lastPoint !== showLastPoint) && lastPoint) {
+  const [t, setT] = useState(0);
+  let lastPoint = props.datapoints[props.datapoints.length - 1];
+
+  if (lastPoint !== showLastPoint && lastPoint) {
     setT(lastPoint);
     showLastPoint = lastPoint;
-    //console.log(showLastPoint , lastPoint, (lastPoint !== showLastPoint));
-    data.datasets[0].data.push(lastPoint);
-    data.datasets[1].data.push(props.avgTBC);
-    data.datasets[1].data = data.datasets[1].data.map((el) => el = props.avgTBC);
-    data.labels.push(++index);
-    //console.log(index);
+    data.datasets[0].data = props.datapoints.slice(0);
+    data.datasets[1].data = props.datapoints.slice(0);
+    data.datasets[1].data = data.datasets[1].data.map((el) => (el = props.avgTBC));
+    data.labels = data.datasets[1].data.map((el, index) => (el = index + 2));
   }
-  if(props.datapoints.length===0){
+  if (props.datapoints.length === 0) {
     data.datasets[0].data = [];
     data.datasets[1].data = [];
     data.labels = [];
-    index = 0; 
-    //console.log(data.labels,data.datasets[0].data);
   }
-  return  (
-    <div id='tbcChart'>
-    <Line options={options} data={data} key={Math.random()}/>
+
+  let d = JSON.parse(JSON.stringify(data)); //deep clone object
+
+  return (
+    <div className="tbcChart">
+      <Line options={options} data={d} id="line1" />
     </div>
   );
 }
 
-export default TbcChart;
+export default memo(TbcChart);
